@@ -1,4 +1,7 @@
-const { MongoMemoryServer } = require('mongodb-memory-server-core');
+const {
+  MongoMemoryServer,
+  MongoMemoryReplSet
+} = require('mongodb-memory-server-core');
 const seed = require('./seed');
 
 class ServerlessMongoDBLocal {
@@ -36,7 +39,7 @@ class ServerlessMongoDBLocal {
 
   get stage() {
     return (this.options && this.options.stage)
-      || (this.serverless.service.provider && this.serverless.service.provider.stage);
+            || (this.serverless.service.provider && this.serverless.service.provider.stage);
   }
 
   shouldExecute() {
@@ -49,8 +52,16 @@ class ServerlessMongoDBLocal {
   async startHandler() {
     if (this.shouldExecute()) {
       this.log('Starting local database');
-      const { stages, ...mmsOptions } = this.config;
-      this.mongod = new MongoMemoryServer(mmsOptions);
+      const {
+        stages,
+        replicaSet,
+        ...mmsOptions
+      } = this.config;
+      if (replicaSet) {
+        this.mongod = new MongoMemoryReplSet(mmsOptions);
+      } else {
+        this.mongod = new MongoMemoryServer(mmsOptions);
+      }
       await this.mongod.getUri();
       const info = this.mongod.getInstanceInfo();
       if (!info) {

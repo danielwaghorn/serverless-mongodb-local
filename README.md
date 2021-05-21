@@ -24,6 +24,7 @@ custom:
   mongodb:
     stages: # If you only want to use MongoDB Local in particular stages, declare them here
       - dev
+    replicaSet: true # Omit or set to false for a single instance
     instance: # MongoMemoryServer() options and defaults https://github.com/nodkz/mongodb-memory-server#available-options-for-mongomemoryserver
       port: 1234
       dbName: MyDB
