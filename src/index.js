@@ -57,13 +57,18 @@ class ServerlessMongoDBLocal {
         replicaSet,
         ...mmsOptions
       } = this.config;
+      let info = null;
       if (replicaSet) {
-        this.mongod = new MongoMemoryReplSet(mmsOptions);
+        this.mongod = new MongoMemoryReplSet({
+          replSet: { mmsOptions }
+        });
+        await this.mongod.waitUntilRunning();
+        info = this.mongod.servers[0].getInstanceInfo();
       } else {
         this.mongod = new MongoMemoryServer(mmsOptions);
+        await this.mongod.getUri();
+        info = this.mongod.getInstanceInfo();
       }
-      await this.mongod.getUri();
-      const info = this.mongod.getInstanceInfo();
       if (!info) {
         this.log('MongoDB failed to start');
       } else {
