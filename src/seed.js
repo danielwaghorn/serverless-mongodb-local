@@ -1,6 +1,6 @@
 const fs = require('fs-extra');
 const path = require('path');
-const { MongoClient } = require('mongodb');
+const { MongoClient, ObjectId } = require('mongodb');
 
 let client;
 
@@ -12,6 +12,25 @@ module.exports = async function seed(dataPath, uri, log) {
       const collection = path.basename(file, '.json');
       try {
         const data = await fs.readJson(path.join(dataPath, file));
+
+        data.map((d) => {
+          Object.keys(d).forEach((key) => {
+            // Parse valid ObjectIDs to the correct type
+            if (d[key] instanceof Object && d[key].$oid) {
+              // eslint-disable-next-line no-param-reassign
+              d[key] = new ObjectId(d[key].$oid);
+            }
+
+            // Parse Dates into ISODate
+            if (d[key] instanceof Object && d[key].$date) {
+              // eslint-disable-next-line no-param-reassign
+              d[key] = `ISODate('${d[key].$date}')`;
+            }
+          });
+
+          return d;
+        });
+
         const db = await getDb(uri);
         const result = await db.collection(collection).insertMany(data);
         log(`Seeded collection "${collection}" with ${result.insertedCount} documents`);
