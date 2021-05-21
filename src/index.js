@@ -104,7 +104,12 @@ class ServerlessMongoDBLocal {
       if (!dataPath) {
         this.log('Skipping seeding: "seed.dataPath" not specified');
       } else {
-        const { uri } = this.mongod.getInstanceInfo();
+        let uri;
+        if (this.mongod instanceof MongoMemoryReplSet) {
+          uri = this.mongod.servers[0].getInstanceInfo().uri;
+        } else {
+          uri = this.mongod.getInstanceInfo().uri;
+        }
         await seed(dataPath, uri, this.log);
       }
     } else {
