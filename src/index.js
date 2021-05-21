@@ -32,7 +32,7 @@ class ServerlessMongoDBLocal {
       'mongodb:start:startHandler': this.startHandler.bind(this),
       'mongodb:stop:stopHandler': this.stopHandler.bind(this),
       'mongodb:seed:seedHandler': this.seedHandler.bind(this),
-      'before:offline:start:init': this.startHandler.bind(this),
+      'before:offline:start': this.startHandler.bind(this),
       'before:offline:start:end': this.stopHandler.bind(this)
     };
   }
