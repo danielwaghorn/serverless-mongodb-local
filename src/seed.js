@@ -24,7 +24,7 @@ module.exports = async function seed(dataPath, uri, log) {
             // Parse Dates into ISODate
             if (d[key] instanceof Object && d[key].$date) {
               // eslint-disable-next-line no-param-reassign
-              d[key] = `ISODate('${d[key].$date}')`;
+              d[key] = new Date(d[key].$date);
             }
           });
 
